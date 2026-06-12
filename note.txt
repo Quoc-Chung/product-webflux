@@ -1,0 +1,31 @@
+R2DBC không hỗ trợ @OneToMany / @ManyToOne như JPA
+
+private Mono<OrderDto.Response> enrichItems(Order order, List<OrderItem> items) {
+        return Flux.fromIterable(items)
+            .flatMap(item ->
+                productRepository.findById(item.getProductId())
+                    .map(product -> OrderDto.ItemResponse.builder()
+                        .id(item.getId())
+                        .productId(item.getProductId())
+                        .productName(product.getName())  // join thủ công
+                        .quantity(item.getQuantity())
+                        .unitPrice(item.getUnitPrice())
+                        .subtotal(item.getUnitPrice()
+                                     .multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .build()
+                    )
+            )
+            .collectList()
+            .map(enrichedItems -> OrderDto.Response.builder()
+                .id(order.getId())
+                .customerName(order.getCustomerName())
+                .status(order.getStatus())
+                .totalAmount(order.getTotalAmount())
+                .createdAt(order.getCreatedAt())
+                .items(enrichedItems)
+                .build()
+            );
+}
+
+
+

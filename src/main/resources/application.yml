@@ -1,1 +1,9 @@
-spring.application.name=product-webflux
+spring:
+  application:
+     name: product-webflux
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/product_webfux
+    username: root
+    password: Ch@/12345678
+server:
+  port: 8080
